@@ -9,13 +9,6 @@ import {
   GLOBAL_MILESTONES_MAP
 } from './constants';
 
-type OctoKitMilestoneList = Octokit.Response<
-  Octokit.IssuesListMilestonesForRepoResponse
->;
-type OctoKitMilestone = Octokit.Response<Octokit.IssuesCreateMilestoneResponse>;
-
-type IssuesCreateMilestoneParams = Octokit.IssuesCreateMilestoneParams;
-
 const OPERATIONS_PER_RUN = 100;
 const SHORTEST_SPRINT_LENGTH_IN_DAYS = 2;
 const NUMBER_OF_WEEKS_OUT_TO_MAKE_MILESTONES = 8;
@@ -40,7 +33,7 @@ export interface MilestoneCreationParams {
  * Handle processing of milestones.
  */
 export class MilestoneProcessor {
-  readonly client: github.GitHub;
+  readonly client;
   readonly options: MilestoneProcessorOptions;
   private operationsLeft: number = 0;
   private currentGlobalMilestoneIds: GlobalMilestone['id'][];
@@ -62,7 +55,7 @@ export class MilestoneProcessor {
   ) {
     this.options = options;
     this.operationsLeft = OPERATIONS_PER_RUN;
-    this.client = new github.GitHub(options.repoToken);
+    this.client = github.getOctokit(options.repoToken);
     this.currentGlobalMilestoneIds = [];
     this.milestonesToAdd = [];
     this.milestoneTitleToGlobalMilestoneIdMap = new Map<
@@ -99,7 +92,7 @@ export class MilestoneProcessor {
     }
 
     // Get the next batch of milestones
-    const milestones: Milestone[] = await this.getMilestones(page);
+    const milestones = await this.getMilestones(page);
     this.operationsLeft -= 1;
 
     if (milestones.length > 0) {
@@ -135,7 +128,7 @@ export class MilestoneProcessor {
     // take that name.
     if (
       state === 'closed' &&
-      description.includes(MILESTONE_TITLE_TAG) &&
+      description?.includes(MILESTONE_TITLE_TAG) &&
       !title.includes(CLOSED_MILESTONE_TITLE_TAG)
     ) {
       return await this.tagClosedMilestone(milestone);
@@ -231,7 +224,7 @@ export class MilestoneProcessor {
 
       // Create the milestones.
       for (const milestone of this.milestonesToAdd.values()) {
-        await this.createMilestone({
+        await this.client.issues.createMilestone({
           owner: github.context.repo.owner,
           repo: github.context.repo.repo,
           title: milestone.title,
@@ -255,26 +248,13 @@ export class MilestoneProcessor {
 
   // Get issues from github in baches of 100
   private async getMilestones(page: number): Promise<Milestone[]> {
-    const milestoneResult: OctoKitMilestoneList = await this.client.issues.listMilestonesForRepo(
-      {
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        per_page: 100,
-        page,
-        state: 'all'
-      }
-    );
-
-    return milestoneResult.data;
-  }
-
-  // Create milestone
-  private async createMilestone(
-    params: IssuesCreateMilestoneParams
-  ): Promise<any> {
-    const milestoneResult: OctoKitMilestone = await this.client.issues.createMilestone(
-      params
-    );
+    const milestoneResult = await this.client.issues.listMilestones({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      per_page: 100,
+      page,
+      state: 'all'
+    });
 
     return milestoneResult.data;
   }

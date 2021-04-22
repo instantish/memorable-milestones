@@ -15,11 +15,11 @@ export interface Milestone {
   title: string;
   number: number;
   updated_at: string;
-  description: string;
+  description: string | null;
   open_issues: number;
   closed_issues: number;
   state: string;
-  due_on?: string;
+  due_on: string | null;
 }
 
 export interface Label {

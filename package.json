@@ -26,26 +26,26 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.6",
-    "@actions/github": "^2.1.1",
-    "@octokit/rest": "^16.43.1",
+    "@actions/github": "^4.0.0",
+    "@octokit/rest": "^18.5.3",
     "moment": "^2.25.1",
-    "semver": "^6.1.1"
+    "semver": "^7.3.5"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.23",
-    "@types/node": "^12.7.12",
-    "@types/semver": "^6.0.0",
-    "@typescript-eslint/parser": "^2.8.0",
+    "@types/jest": "^26.0.22",
+    "@types/node": "^14.14.41",
+    "@types/semver": "^7.3.4",
+    "@typescript-eslint/parser": "^4.22.0",
     "@vercel/ncc": "^0.28.3",
-    "eslint": "^5.16.0",
-    "eslint-plugin-github": "^2.0.0",
-    "eslint-plugin-jest": "^22.21.0",
+    "eslint": "^7.24.0",
+    "eslint-plugin-github": "^4.1.3",
+    "eslint-plugin-jest": "^24.3.5",
     "eslint-plugin-prettier": "^3.1.3",
-    "jest": "^24.9.0",
-    "jest-circus": "^24.9.0",
-    "js-yaml": "^3.13.1",
-    "prettier": "^1.19.1",
-    "ts-jest": "^24.2.0",
-    "typescript": "^3.6.4"
+    "jest": "^26.6.3",
+    "jest-circus": "^26.6.3",
+    "js-yaml": "^4.1.0",
+    "prettier": "^2.2.1",
+    "ts-jest": "^26.5.5",
+    "typescript": "^4.2.4"
   }
 }
